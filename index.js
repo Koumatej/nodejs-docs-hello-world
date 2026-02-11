@@ -127,6 +127,28 @@ router.delete('/accounts/:user', (req, res) => {
   
     res.sendStatus(204);
   });
+
+
+  const { AzureOpenAI } = require("openai");
+
+// Nastavení přístupu - v produkci doporučuji použít Environment Variables v Azure!
+const endpoint = "https://koutestai.openai.azure.com/";
+const apiKey = "CX2UVMCooNIkf9ujHPLqy427QC7z0C0u27kZOLBkHsNHrefDtaN4JQQJ99CBACPV0roXJ3w3AAABACOGwxWv";
+const deployment = "kouTestAI"; 
+
+const client = new AzureOpenAI({ endpoint, apiKey, deployment, apiVersion: "2024-05-01-preview" });
+
+async function getAIResponse(userPrompt) {
+  const result = await client.chat.completions.create({
+    messages: [
+        { role: "system", content: "Jsi užitečný asistent běžící na Azure Web App." },
+        { role: "user", content: userPrompt }
+    ],
+    max_tokens: 800,
+  });
+
+  return result.choices[0].message.content;
+}
   
   // ----------------------------------------------
   
