@@ -8,7 +8,6 @@ const bodyParser = require('body-parser');
 const cors = require('cors')
 const crypto = require('crypto');
 const { AzureOpenAI } = require("openai");
-const app = express();
 const pkg = require('./package.json');
 
 
