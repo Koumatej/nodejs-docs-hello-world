@@ -12,7 +12,7 @@ const pkg = require('./package.json');
 
 
 // App constants
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 const apiPrefix = '/api';
 
 // Store data in-memory, not suited for production use!
@@ -202,10 +202,6 @@ app.post('/ask', async (req, res) => {
     } catch (err) {
         res.status(500).json({ answer: "Chyba: " + err.message });
     }
-});
-
-app.listen(port, () => {
-    console.log(`App listening at http://localhost:${port}`);
 });
   
   // ----------------------------------------------
