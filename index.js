@@ -7,6 +7,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors')
 const crypto = require('crypto');
+const { AzureOpenAI } = require("openai");
+const app = express();
 const pkg = require('./package.json');
 
 
@@ -149,6 +151,66 @@ async function getAIResponse(userPrompt) {
 
   return result.choices[0].message.content;
 }
+
+// 1. Endpoint, který vrací HTML stránku (to, co uvidíš v prohlížeči)
+app.get('/', (req, res) => {
+    res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Moje Azure AI App</title>
+            <style>
+                body { font-family: sans-serif; text-align: center; padding: 50px; }
+                input { padding: 10px; width: 300px; }
+                button { padding: 10px; cursor: pointer; }
+                #result { margin-top: 20px; font-weight: bold; color: #0078d4; }
+            </style>
+        </head>
+        <body>
+            <h1>Ahoj! Zeptej se mé AI:</h1>
+            <input type="text" id="question" placeholder="Napiš něco...">
+            <button onclick="ask()">Odeslat</button>
+            <div id="result"></div>
+
+            <script>
+                async function ask() {
+                    const q = document.getElementById('question').value;
+                    const resDiv = document.getElementById('result');
+                    resDiv.innerText = 'Přemýšlím...';
+                    
+                    const response = await fetch('/ask', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ prompt: q })
+                    });
+                    const data = await response.json();
+                    resDiv.innerText = data.answer;
+                }
+            </script>
+        </body>
+        </html>
+    `);
+});
+
+// 2. Endpoint, který komunikuje s Azure OpenAI
+app.post('/ask', async (req, res) => {
+    try {
+        const result = await client.chat.completions.create({
+            messages: [
+                { role: "system", content: "Jsi vtipný asistent běžící na Azure." },
+                { role: "user", content: req.body.prompt }
+            ],
+            max_tokens: 100,
+        });
+        res.json({ answer: result.choices[0].message.content });
+    } catch (err) {
+        res.status(500).json({ answer: "Chyba: " + err.message });
+    }
+});
+
+app.listen(port, () => {
+    console.log(`App listening at http://localhost:${port}`);
+});
   
   // ----------------------------------------------
   
