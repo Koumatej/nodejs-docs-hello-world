@@ -129,9 +129,6 @@ router.delete('/accounts/:user', (req, res) => {
     res.sendStatus(204);
   });
 
-
-  const { AzureOpenAI } = require("openai");
-
 // Nastavení přístupu - v produkci doporučuji použít Environment Variables v Azure!
 const endpoint = "https://koutestai.openai.azure.com/";
 const apiKey = process.env.AZURE_OPENAI_KEY;
